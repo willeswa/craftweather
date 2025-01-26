@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wanjala.weathercraft.CitySearchUiState
 import com.wanjala.weathercraft.MainViewModel
-import com.wanjala.weathercraft.data.models.CurrentWeather
 import com.wanjala.weathercraft.data.models.ExtraWeatherInfo
 import com.wanjala.weathercraft.ui.theme.body1
 import com.wanjala.weathercraft.ui.theme.caption
@@ -56,26 +57,40 @@ fun CurrentWeatherSection(
         }
     }
 
-    when (uiState) {
-        is CitySearchUiState.FetchingWeather -> LoadingState(modifier)
-        is CitySearchUiState.Error -> {
-            val errorMessage = (uiState as CitySearchUiState.Error).message
-            ErrorState(modifier = modifier, message = errorMessage)
-        }
-        else -> {
-            currentWeather?.let { weather ->
-                WeatherContent(
-                    modifier = modifier,
-                    currentTemp = weather.temperature,
-                    maxTemp = weather.maxTemperature,
-                    minTemp = weather.minTemperature,
-                    description = weather.description,
-                    extraInfoItems = weather.extraInfo
-                )
-            } ?: NoDataState(modifier)
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .heightIn(min = 300.dp), // Minimum height during loading or no data
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White.copy(alpha = 0.1f)
+    ) {
+        when (uiState) {
+            is CitySearchUiState.FetchingWeather -> {
+                // Show loading state
+                LoadingState(modifier = Modifier.fillMaxSize())
+            }
+            is CitySearchUiState.Error -> {
+                // Show error state
+                val errorMessage = (uiState as CitySearchUiState.Error).message
+                ErrorState(modifier = Modifier.fillMaxSize(), message = errorMessage)
+            }
+            else -> {
+                currentWeather?.let { weather ->
+                    WeatherContent(
+                        modifier = Modifier.fillMaxSize(),
+                        currentTemp = weather.temperature,
+                        maxTemp = weather.maxTemperature,
+                        minTemp = weather.minTemperature,
+                        description = weather.description,
+                        extraInfoItems = weather.extraInfo
+                    )
+                } ?: NoDataState(modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
+
 
 
 

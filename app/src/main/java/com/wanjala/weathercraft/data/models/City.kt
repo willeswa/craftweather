@@ -13,7 +13,7 @@ data class City(
     val coordinates: Coordinates = Coordinates(),
     val name: String = "",
     val country: String = "Unknown",
-    val placeId: String = "", // Useful for integration with external APIs
-    val timezone: String = "UTC", // Default to UTC
-    val utcOffset: Int = 0 // Timezone offset in minutes
+    val placeId: String = "",
+    val timezone: String = "UTC",
+    val utcOffset: Int = 0
 )

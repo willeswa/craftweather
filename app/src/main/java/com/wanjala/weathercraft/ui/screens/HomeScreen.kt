@@ -1,5 +1,6 @@
 package com.wanjala.weathercraft.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.wanjala.weathercraft.MainViewModel
 import com.wanjala.weathercraft.data.models.City
-import com.wanjala.weathercraft.data.models.CurrentWeather
-import com.wanjala.weathercraft.data.models.DailyForecast
 import com.wanjala.weathercraft.ui.components.CurrentWeatherSection
 import com.wanjala.weathercraft.ui.components.DailyForecastSection
 import com.wanjala.weathercraft.ui.components.TopHomeSection
 import com.wanjala.weathercraft.utils.getGradientForWeather
+import com.wanjala.weathercraft.utils.getTimeElapsedSince
 
 @Composable
 fun HomeScreen(
@@ -35,6 +35,7 @@ fun HomeScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val selectedCity by viewModel.selectedCity.collectAsState()
+    val currentWeather by viewModel.currentWeather.collectAsState()
 
     Box(
         modifier = Modifier
@@ -47,7 +48,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             TopHomeSection(
                 city = selectedCity ?: City(), // Pass the selected city
-                lastUpdate = "Today, ${System.currentTimeMillis()}",
+                lastUpdate = currentWeather?.timestamp ?: System.currentTimeMillis(),
                 navController = navController
             )
 

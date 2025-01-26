@@ -25,12 +25,13 @@ import androidx.navigation.NavController
 import com.wanjala.weathercraft.data.models.City
 import com.wanjala.weathercraft.data.models.Coordinates
 import com.wanjala.weathercraft.ui.navigation.Screen
+import com.wanjala.weathercraft.utils.getTimeElapsedSince
 
 @Composable
 fun TopHomeSection(
     modifier: Modifier = Modifier,
     city: City,
-    lastUpdate: String = "Last updated: Today",
+    lastUpdate: Long,
     navController: NavController
 ) {
     Row(
@@ -57,7 +58,7 @@ fun TopHomeSection(
                     )
                 )
                 Text(
-                    text = lastUpdate,
+                    text = getTimeElapsedSince(lastUpdate),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Color.White.copy(alpha = 0.7f)
                     )

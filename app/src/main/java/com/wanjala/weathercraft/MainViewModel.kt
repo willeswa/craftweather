@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wanjala.weathercraft.data.models.City
 import com.wanjala.weathercraft.data.models.CurrentWeatherUIModel
-import com.wanjala.weathercraft.data.models.DailyForecast
 import com.wanjala.weathercraft.data.models.DailyForecastUIModel
 import com.wanjala.weathercraft.data.models.ForecastUIModel
 import com.wanjala.weathercraft.data.repositories.MainRepositoryImpl
@@ -99,6 +98,7 @@ class MainViewModel @Inject constructor(private val repository: MainRepositoryIm
     fun triggerWeatherFetch(city: City) {
         _weatherUIState.value = CitySearchUiState.FetchingWeather
         viewModelScope.launch {
+            delay(1000)
             try {
                 val weather = repository.getCurrentWeather(
                     lat = city.coordinates.latitude,
@@ -115,6 +115,7 @@ class MainViewModel @Inject constructor(private val repository: MainRepositoryIm
     fun triggerForecastFetch(city: City) {
         _forecastUIState.value = CitySearchUiState.FetchingWeather
         viewModelScope.launch {
+            delay(1000)
             try {
                 val forecast = repository.getWeatherForecast(
                     lat = city.coordinates.latitude,
@@ -152,11 +153,11 @@ class MainViewModel @Inject constructor(private val repository: MainRepositoryIm
                 // Navigate to home
                 onNavigateToHome()
             } catch (e: Exception) {
+                // Handle failure
                 _searchUIState.value = CitySearchUiState.Error("Failed to change city: ${e.localizedMessage}")
             }
         }
     }
-
 
     private fun resetSearchState() {
         searchQuery = ""

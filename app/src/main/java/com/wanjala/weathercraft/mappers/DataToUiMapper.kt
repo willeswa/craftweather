@@ -67,7 +67,8 @@ fun CurrentWeatherEntity.toUIModel(): CurrentWeatherUIModel {
         maxTemperature = maxTemperature,
         minTemperature = minTemperature,
         description = description,
-        extraInfo = extraInfoItems
+        extraInfo = extraInfoItems,
+        timestamp = timestamp
     )
 }
 

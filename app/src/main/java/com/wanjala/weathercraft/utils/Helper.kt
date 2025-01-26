@@ -90,3 +90,29 @@ fun getIconForTitle(title: String): ImageVector {
         else -> Icons.Sharp.CloudQueue // Default icon
     }
 }
+
+
+fun getTimeElapsedSince(lastUpdatedTime: Long): String {
+    val now = System.currentTimeMillis()
+    val elapsedTime = now - lastUpdatedTime // Time difference in milliseconds
+
+    val seconds = elapsedTime / 1000
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+
+    return when {
+        seconds < 60 -> {
+            "$seconds second${if (seconds > 1) "s" else ""} ago"
+        }
+        minutes < 60 -> {
+            "$minutes minute${if (minutes > 1) "s" else ""} ago"
+        }
+        hours < 24 -> {
+            "$hours hour${if (hours > 1) "s" else ""} ago"
+        }
+        else -> {
+            "$days day${if (days > 1) "s" else ""} ago"
+        }
+    }
+}

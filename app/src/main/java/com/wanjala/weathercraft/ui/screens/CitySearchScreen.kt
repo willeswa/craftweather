@@ -50,6 +50,14 @@ fun CitySearchScreen(
             is CitySearchUiState.Saving -> {
                 SavingProgressOverlay()
             }
+            is CitySearchUiState.Error -> {
+                val errorMessage = (uiState as CitySearchUiState.Error).message
+                ErrorOverlay(
+                    message = errorMessage,
+                    onRetry = { /* Retry logic */ },
+                    navController = navController
+                )
+            }
             else -> {
                 CitySearchContent(
                     searchQuery = searchQuery,
@@ -70,6 +78,45 @@ fun CitySearchScreen(
         }
     }
 }
+
+@Composable
+fun ErrorOverlay(
+    message: String,
+    onRetry: () -> Unit,
+    navController: NavController
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp))
+                .padding(16.dp)
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.error),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Button(onClick = onRetry) {
+                    Text("Retry")
+                }
+                OutlinedButton(onClick = { navController.navigateUp() }) {
+                    Text("Back")
+                }
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun CitySearchContent(

@@ -4,8 +4,7 @@ import android.util.Log
 import com.wanjala.weathercraft.data.models.City
 import com.wanjala.weathercraft.data.models.CurrentWeatherUIModel
 import com.wanjala.weathercraft.data.models.DailyForecastUIModel
-import com.wanjala.weathercraft.data.models.ForecastUIModel
-import com.wanjala.weathercraft.data.predefinedCities
+
 import com.wanjala.weathercraft.data.sources.local.db.WeatherDao
 import com.wanjala.weathercraft.data.sources.local.session.SessionManagerImpl
 import com.wanjala.weathercraft.data.sources.remote.WeatherApiService
@@ -17,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import predefinedCities
 import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(

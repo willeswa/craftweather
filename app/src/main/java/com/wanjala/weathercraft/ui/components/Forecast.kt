@@ -36,8 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.wanjala.weathercraft.CitySearchUiState
 import com.wanjala.weathercraft.MainViewModel
-import com.wanjala.weathercraft.R
-import com.wanjala.weathercraft.data.models.DailyForecast
+
 import com.wanjala.weathercraft.data.models.DailyForecastUIModel
 import com.wanjala.weathercraft.utils.toFormattedTime
 import com.wanjala.weathercraft.utils.toHumanReadableDate

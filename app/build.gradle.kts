@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.android.hilt)
 }
 
+// Load local.properties file
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -16,6 +17,9 @@ if (localPropertiesFile.exists()) {
         localProperties.load(input)
     }
 }
+
+// Read API key from environment variable or local.properties
+val weatherApiKey: String = System.getenv("WEATHER_API_KEY") ?: localProperties.getProperty("weatherApiKey") ?: ""
 
 android {
     namespace = "com.wanjala.weathercraft"
@@ -30,10 +34,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val weatherApiKey: String = localProperties.getProperty("weatherApiKey") ?: ""
-
+        // Add the API key to BuildConfig
         buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
-
     }
 
     buildTypes {
@@ -45,24 +47,24 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
 
-
-
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
-
 }
 
 kapt {
@@ -70,7 +72,6 @@ kapt {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

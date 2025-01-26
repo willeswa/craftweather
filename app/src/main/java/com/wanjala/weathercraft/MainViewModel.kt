@@ -13,6 +13,7 @@ import com.wanjala.weathercraft.data.models.DailyForecastUIModel
 import com.wanjala.weathercraft.data.models.ForecastUIModel
 import com.wanjala.weathercraft.data.repositories.MainRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -119,7 +120,7 @@ class MainViewModel @Inject constructor(private val repository: MainRepositoryIm
                     lat = city.coordinates.latitude,
                     lon = city.coordinates.longitude
                 )
-                _forecastData.value = forecast.dailyForecasts
+                _forecastData.value = forecast
                 _forecastUIState.value = CitySearchUiState.Idle
             } catch (e: Exception) {
                 _forecastUIState.value = CitySearchUiState.Error("Failed to fetch forecast data: ${e.localizedMessage}")
@@ -131,15 +132,31 @@ class MainViewModel @Inject constructor(private val repository: MainRepositoryIm
         _searchUIState.value = CitySearchUiState.Saving
         viewModelScope.launch {
             try {
+                // Attempt to fetch weather and forecast for the new city
+                val weatherJob = async { repository.getCurrentWeather(city.coordinates.latitude, city.coordinates.longitude) }
+                val forecastJob = async { repository.getWeatherForecast(city.coordinates.latitude, city.coordinates.longitude) }
+
+                // Await both fetches
+                val weather = weatherJob.await()
+                val forecast = forecastJob.await()
+
+                // Update UI with fetched data
+                _currentWeather.value = weather
+                _forecastData.value = forecast
+
+                // Save the city if all fetches succeed
                 repository.saveSelectedCity(city)
                 _selectedCity.value = city
-                _searchUIState.value = CitySearchUiState.Success("City saved successfully!")
+                _searchUIState.value = CitySearchUiState.Success("City changed successfully!")
+
+                // Navigate to home
                 onNavigateToHome()
             } catch (e: Exception) {
-                _searchUIState.value = CitySearchUiState.Error("Failed to save city: ${e.localizedMessage}")
+                _searchUIState.value = CitySearchUiState.Error("Failed to change city: ${e.localizedMessage}")
             }
         }
     }
+
 
     private fun resetSearchState() {
         searchQuery = ""

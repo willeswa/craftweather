@@ -11,6 +11,7 @@ import com.wanjala.weathercraft.data.models.DailyForecastUIModel
 import com.wanjala.weathercraft.data.models.ExtraWeatherInfo
 import com.wanjala.weathercraft.data.models.ForecastUIModel
 import com.wanjala.weathercraft.data.sources.local.db.CurrentWeatherEntity
+import com.wanjala.weathercraft.data.sources.local.db.DailyForecastEntity
 import com.wanjala.weathercraft.data.sources.remote.models.CurrentWeatherResponse
 import com.wanjala.weathercraft.data.sources.remote.models.ForecastResponse
 import java.util.Locale
@@ -86,5 +87,30 @@ fun CurrentWeatherResponse.toEntity(): CurrentWeatherEntity {
             )
         ),
         timestamp = System.currentTimeMillis()
+    )
+}
+
+
+fun ForecastResponse.toEntities(): List<DailyForecastEntity> {
+    return list.map { forecast ->
+        DailyForecastEntity(
+            date = forecast.dtTxt, // Datetime from the API
+            tempMin = forecast.main.tempMin,
+            tempMax = forecast.main.tempMax,
+            description = forecast.weather.firstOrNull()?.description ?: "N/A",
+            icon = forecast.weather.firstOrNull()?.icon ?: "01d", // Default sunny icon
+            timestamp = System.currentTimeMillis()
+        )
+    }
+}
+
+
+fun DailyForecastEntity.toUIModel(): DailyForecastUIModel {
+    return DailyForecastUIModel(
+        date = this.date,
+        tempMin = this.tempMin,
+        tempMax = this.tempMax,
+        description = this.description,
+        icon = this.icon
     )
 }

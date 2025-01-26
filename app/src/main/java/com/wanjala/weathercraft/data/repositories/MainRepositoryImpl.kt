@@ -3,11 +3,13 @@ package com.wanjala.weathercraft.data.repositories
 import android.util.Log
 import com.wanjala.weathercraft.data.models.City
 import com.wanjala.weathercraft.data.models.CurrentWeatherUIModel
+import com.wanjala.weathercraft.data.models.DailyForecastUIModel
 import com.wanjala.weathercraft.data.models.ForecastUIModel
 import com.wanjala.weathercraft.data.predefinedCities
 import com.wanjala.weathercraft.data.sources.local.db.WeatherDao
 import com.wanjala.weathercraft.data.sources.local.session.SessionManagerImpl
 import com.wanjala.weathercraft.data.sources.remote.WeatherApiService
+import com.wanjala.weathercraft.mappers.toEntities
 import com.wanjala.weathercraft.mappers.toEntity
 import com.wanjala.weathercraft.mappers.toUIModel
 import com.wanjala.weathercraft.utils.handleApiError
@@ -36,30 +38,43 @@ class MainRepositoryImpl @Inject constructor(
             try {
                 // Fetch data from server
                 val response = weatherApiService.getCurrentWeather(latitude = lat, longitude = lon)
-
-                weatherDao.insertCurrentWeather(response.toEntity()) // Save new data to DB
+                weatherDao.clearCurrentWeather()
+                weatherDao.insertCurrentWeather(response.toEntity()) // Save to DB
             } catch (e: Exception) {
                 Log.e("Repository", "Error fetching current weather: ${e.message}")
-                handleApiError(e) // Log or handle server errors
+                // Log but proceed to fetch from DB
             }
-            // Return data from Room
+            // Return cached data
             val cachedWeather = weatherDao.getCurrentWeather()
-            Log.d("======>", cachedWeather?.toString() ?: "no data")
-            cachedWeather?.toUIModel() ?: throw Exception("No data available")
+            cachedWeather?.toUIModel() ?: throw Exception("No current weather data available")
         }
     }
 
 
-    suspend fun getWeatherForecast(lat: Double, lon: Double): ForecastUIModel {
+
+    suspend fun getWeatherForecast(lat: Double, lon: Double): List<DailyForecastUIModel> {
         return withContext(Dispatchers.IO) {
             try {
+                // Fetch data from server
                 val response = weatherApiService.getWeatherForecast(latitude = lat, longitude = lon)
-                response.toUIModel() // Map ForecastResponse to ForecastUIModel
+                val forecastEntities = response.toEntities()
+
+                // Clear and update forecasts in DB
+                weatherDao.clearForecasts()
+                weatherDao.insertForecasts(forecastEntities)
             } catch (e: Exception) {
-                throw handleApiError(e)
+                Log.e("Repository", "Error fetching forecast: ${e.message}")
+                // Log but proceed to fetch from DB
             }
+            // Return cached data
+            val cachedForecasts = weatherDao.getAllForecasts()
+            if (cachedForecasts.isEmpty()) {
+                throw Exception("No forecast data available")
+            }
+            cachedForecasts.map { it.toUIModel() }
         }
     }
+
 
     suspend fun saveSelectedCity(city: City) {
         sessionManager.saveSelectedCity(city)

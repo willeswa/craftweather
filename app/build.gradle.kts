@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,8 +9,13 @@ plugins {
     alias(libs.plugins.android.hilt)
 }
 
-val weatherApiKey: String = project.findProperty("WEATHER_API_KEY") as String? ?: ""
-val baseUrl: String = project.findProperty("BASE_URL") as String? ?: ""
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { input ->
+        localProperties.load(input)
+    }
+}
 
 android {
     namespace = "com.wanjala.weathercraft"
@@ -22,21 +29,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val weatherApiKey: String = localProperties.getProperty("weatherApiKey") ?: ""
+
+        buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
+
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
-            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-        debug {
-            buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
-            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         }
     }
     compileOptions {

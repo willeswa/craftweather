@@ -1,10 +1,13 @@
 package com.wanjala.weathercraft.di
 
 import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.wanjala.weathercraft.BuildConfig
 import com.wanjala.weathercraft.data.repositories.MainRepositoryImpl
+import com.wanjala.weathercraft.data.sources.local.db.AppDatabase
+import com.wanjala.weathercraft.data.sources.local.db.WeatherDao
 import com.wanjala.weathercraft.data.sources.local.session.SessionManagerImpl
 import com.wanjala.weathercraft.data.sources.remote.WeatherApiService
 import dagger.Module
@@ -21,6 +24,22 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "weathercraft_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherDao(appDatabase: AppDatabase): WeatherDao {
+        return appDatabase.weatherDao()
+    }
 
     @Provides
     @Singleton
@@ -69,8 +88,9 @@ object AppModule {
     @Singleton
     fun provideMainRepository(
         sessionManager: SessionManagerImpl,
-        weatherApiService: WeatherApiService
+        weatherApiService: WeatherApiService,
+        weatherDao: WeatherDao
     ): MainRepositoryImpl {
-        return MainRepositoryImpl(sessionManager, weatherApiService)
+        return MainRepositoryImpl(sessionManager, weatherApiService, weatherDao)
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wanjala.weathercraft.data.models.ExtraWeatherInfo
+import com.wanjala.weathercraft.utils.getIconForTitle
 
 @Composable
 fun WeatherExtraInfoItem(info: ExtraWeatherInfo) {
@@ -29,7 +30,7 @@ fun WeatherExtraInfoItem(info: ExtraWeatherInfo) {
     ) {
         // Icon
         Icon(
-            imageVector = info.icon,
+            imageVector = getIconForTitle(title = info.title),
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier.size(24.dp)

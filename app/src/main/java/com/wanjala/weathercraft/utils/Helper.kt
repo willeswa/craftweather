@@ -1,7 +1,12 @@
 package com.wanjala.weathercraft.utils
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.sharp.Air
+import androidx.compose.material.icons.sharp.CloudQueue
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 
 import retrofit2.HttpException
 import java.io.IOException
@@ -74,4 +79,14 @@ fun String.toFormattedTime(): String {
     val outputFormatter = DateTimeFormatter.ofPattern("h a", Locale.getDefault())
     // Format the LocalDateTime to the desired time string
     return dateTime.format(outputFormatter)
+}
+
+
+fun getIconForTitle(title: String): ImageVector {
+    return when (title) {
+        "Wind Speed" -> Icons.Sharp.Air
+        "Humidity" -> Icons.Filled.WaterDrop
+        "Clouds" -> Icons.Sharp.CloudQueue
+        else -> Icons.Sharp.CloudQueue // Default icon
+    }
 }

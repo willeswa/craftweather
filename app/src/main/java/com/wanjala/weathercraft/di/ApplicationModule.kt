@@ -39,7 +39,7 @@ object AppModule {
             .addInterceptor(Interceptor { chain ->
                 val original = chain.request()
                 val url = original.url.newBuilder()
-                    .addQueryParameter("appid", "cfe577b09f43deea2722462eea76e473") // Use BuildConfig.WEATHER_API_KEY
+                    .addQueryParameter("appid", BuildConfig.WEATHER_API_KEY) // Use BuildConfig.WEATHER_API_KEY
                     .build()
                 val request = original.newBuilder()
                     .url(url)

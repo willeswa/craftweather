@@ -72,7 +72,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://api.openweathermap.org/data/2.5/") // Weather API base URL
+            .baseUrl("https://api.openweathermap.org/data/2.5/") // Weather API base URL
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

@@ -9,6 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read  # Required to access artifact download URLs
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4  # Use checkout v4
@@ -36,7 +41,7 @@ jobs:
         run: ./gradlew assembleDebug  # Build the debug APK
 
       - name: Upload APK as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Use v4 to avoid deprecation warnings
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk  # Path to the debug APK
@@ -49,7 +54,8 @@ jobs:
             const pr = context.payload.pull_request;
             return pr.number;
 
-      - name: Add APK download link to PR comment
+      - name: Generate direct download link for artifact
+        id: artifact
         uses: actions/github-script@v6
         with:
           script: |
@@ -61,11 +67,37 @@ jobs:
 
             const artifact = artifacts.artifacts.find(art => art.name === 'app-debug');
             if (artifact) {
-              const downloadUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/suites/${context.runId}/artifacts/${artifact.id}`;
-              await github.rest.issues.createComment({
+              const { data: download } = await github.rest.actions.downloadArtifact({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: ${{ steps.pr.outputs.result }},
-                body: `🚀 APK is ready for testing! Download it [here](${downloadUrl}).`,
+                artifact_id: artifact.id,
+                archive_format: 'zip',
               });
+              return download.url;
             }
+
+      - name: Add APK download link to PR comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const downloadUrl = '${{ steps.artifact.outputs.result }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.pr.outputs.result }},
+              body: `
+              ✨ **Hello there!** ✨
+              
+              Your APK is ready and waiting for you! 🚀
+              
+              📲 **Download the APK here:** [Download APK](${downloadUrl})
+              
+              This build was crafted with care, tested with precision, and is now ready for your review. Feel free to test it out and let us know how it performs! 💫
+            
+            ---
+            
+            **Pro Tip:** If you encounter any issues or have feedback, don't hesitate to drop a comment below. We're here to make this the best experience possible! 🌟
+              
+              Happy testing! 🎉
+              `,
+              });
